@@ -330,22 +330,68 @@
     requestAnimationFrame(tick);
   }
 
-  /* İletişim formu demo */
+  /* İletişim formu — FormSubmit.co üzerinden gerçek e-posta gönderimi (AJAX) */
   if (form && formStatus) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var fd = new FormData(form);
       var name = (fd.get("name") || "").toString().trim();
       var email = (fd.get("email") || "").toString().trim();
-      if (!name || !email) {
-        formStatus.textContent = "Lütfen ad ve e-posta alanlarını doldurun.";
+      var message = (fd.get("message") || "").toString().trim();
+
+      if (!name || !email || !message) {
+        formStatus.textContent = "Lütfen ad, e-posta ve mesaj alanlarını doldurun.";
         formStatus.classList.remove("is-success");
+        formStatus.classList.add("is-error");
         return;
       }
-      formStatus.textContent =
-        "Teşekkürler, " + name.split(" ")[0] + " — bu statik demo kayıt göndermez.";
-      formStatus.classList.add("is-success");
-      form.reset();
+
+      var submitBtn = form.querySelector('button[type="submit"]');
+      var originalLabel = submitBtn ? submitBtn.textContent : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Gönderiliyor…";
+      }
+      formStatus.classList.remove("is-success", "is-error");
+      formStatus.textContent = "";
+
+      var endpoint = "https://formsubmit.co/ajax/arifbatuhanbahar@gmail.com";
+      fetch(endpoint, {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          message: message,
+          _subject: "Myola BioSense — yeni iletişim mesajı",
+          _template: "table",
+          _captcha: "false"
+        })
+      })
+        .then(function (res) { return res.json().catch(function () { return {}; }).then(function (j) { return { ok: res.ok, body: j }; }); })
+        .then(function (r) {
+          if (r.ok) {
+            formStatus.textContent =
+              "Teşekkürler, " + name.split(" ")[0] + " — mesajınız iletildi.";
+            formStatus.classList.add("is-success");
+            form.reset();
+          } else {
+            formStatus.textContent =
+              "Gönderim başarısız oldu. Lütfen doğrudan e-posta gönderin: arifbatuhanbahar@gmail.com";
+            formStatus.classList.add("is-error");
+          }
+        })
+        .catch(function () {
+          formStatus.textContent =
+            "Bağlantı hatası. Lütfen doğrudan e-posta gönderin: arifbatuhanbahar@gmail.com";
+          formStatus.classList.add("is-error");
+        })
+        .then(function () {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalLabel;
+          }
+        });
     });
   }
 })();

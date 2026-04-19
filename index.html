@@ -796,11 +796,20 @@ u[k] = K<sub>p</sub> · e[k]
       <section id="slide-19" class="slide slide--contact" data-section="19">
         <div class="slide__inner slide__inner--narrow">
           <header class="section-head">
-            <p class="eyebrow"><span class="section-num">19</span> Kapanış</p>
-            <h2 class="section-title">İletişim &amp; notlar</h2>
-            <p class="section-desc">Bu form statik sitede demo amaçlıdır; gönderim simüle edilir.</p>
+            <p class="eyebrow"><span class="section-num">19</span> İletişim</p>
+            <h2 class="section-title">Myola BioSense ekibine yazın</h2>
+            <p class="section-desc">Sorularınız, iş birliği önerileri ve jüri geri bildirimleri için — mesajınız doğrudan ekip e-postasına iletilir.</p>
           </header>
-          <form class="contact-form glass-panel" id="contact-form" novalidate>
+          <form
+            class="contact-form glass-panel"
+            id="contact-form"
+            action="https://formsubmit.co/arifbatuhanbahar@gmail.com"
+            method="POST"
+          >
+            <input type="hidden" name="_subject" value="Myola BioSense — yeni iletişim mesajı" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none" />
             <label class="field">
               <span class="field__label">Ad Soyad</span>
               <input class="field__input" type="text" name="name" autocomplete="name" required placeholder="Örn. Jüri Üyesi" />
@@ -810,15 +819,21 @@ u[k] = K<sub>p</sub> · e[k]
               <input class="field__input" type="email" name="email" autocomplete="email" required placeholder="ornek@kurum.edu.tr" />
             </label>
             <label class="field">
-              <span class="field__label">Not</span>
-              <textarea class="field__input field__input--area" name="note" rows="3" placeholder="Soru veya geri bildirim"></textarea>
+              <span class="field__label">Mesaj</span>
+              <textarea class="field__input field__input--area" name="message" rows="4" required placeholder="Mesajınız"></textarea>
             </label>
-            <button class="btn btn--primary btn--block" type="submit">Gönder (demo)</button>
+            <button class="btn btn--primary btn--block" type="submit">Mesaj gönder</button>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </form>
+          <p class="contact-direct">
+            Ya da doğrudan yazın →
+            <a class="contact-direct__link" href="mailto:arifbatuhanbahar@gmail.com?subject=Myola%20BioSense%20%E2%80%94%20%C4%B0leti%C5%9Fim">
+              arifbatuhanbahar@gmail.com
+            </a>
+          </p>
           <footer class="site-footer">
             <p><strong>Myola BioSense</strong> · Uç birim mimarisi &amp; DFD sunumu</p>
-            <p class="site-footer__muted">© 2026 · GitHub Pages ile yayın · <kbd>Ctrl</kbd>+<kbd>P</kbd> ile PDF'e aktarılabilir</p>
+            <p class="site-footer__muted">© 2026 · Tüm hakları saklıdır.</p>
           </footer>
         </div>
       </section>

@@ -8,7 +8,7 @@ Jüriye sunulan **Myola BioSense** rehabilitasyon cihazı (elektroterapi) için 
 
 - Yalnızca **GitHub Pages**: statik dosyalar, **build yok**.
 - Tüm `href` / `src` yolları **göreli** (`./style.css` vb.).
-- İletişim formu **gerçek sunucu göndermez**; demo mesajı gösterir.
+- İletişim formu **FormSubmit.co** üzerinden (`https://formsubmit.co/ajax/arifbatuhanbahar@gmail.com`) gerçek e-posta gönderir; sayfa yenilenmeden AJAX ile iletilir.
 
 ## Yapı
 
