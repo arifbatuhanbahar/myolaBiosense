@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Myola BioSense — ESP32-S3 tabanlı dinamik rehabilitasyon uç birimi: biyo-sinyal DAQ, z-uzayı PID kapalı çevrim kontrolü, PWM solenoid sürücü, BLE veri iletimi." />
+    <meta name="theme-color" content="#050510" />
+    <title>Myola BioSense — Uç Birim Mimarisi &amp; DFD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
+
+    <a class="skip-link" href="#slide-1">İçeriğe geç</a>
+
+    <div class="progress-bar" aria-hidden="true">
+      <div class="progress-bar__fill" id="progress-fill"></div>
+      <span class="progress-bar__count" id="progress-count">01 / 17</span>
+    </div>
+
+    <div class="kbd-hint" id="kbd-hint" aria-hidden="true">
+      <span class="kbd">↑</span><span class="kbd">↓</span>
+      <span class="kbd-hint__text">ile gezin</span>
+    </div>
+
+    <nav class="dot-nav" aria-label="Bölüm navigasyonu">
+      <ol class="dot-nav__list">
+        <li><button type="button" class="dot-nav__btn is-active" data-target="slide-1" data-label="Kapak" aria-label="Kapak" aria-current="true"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-2" data-label="Problem &amp; çözüm" aria-label="Problem ve çözüm"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-3" data-label="Klinik temel" aria-label="Klinik temel ve endikasyonlar"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-4" data-label="Biyobelirteçler" aria-label="Klinik çıktılar ve biyobelirteçler"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-5" data-label="Sistem mimarisi" aria-label="Sistem mimarisi"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-6" data-label="Donanım şeması" aria-label="Donanım blok şeması"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-7" data-label="Sensör katmanı" aria-label="Sensör katmanı"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-8" data-label="Sinyal işleme" aria-label="Sinyal işleme hattı"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-9" data-label="Kontrol · PID" aria-label="Kontrol algoritması"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-10" data-label="Durum makinesi" aria-label="Firmware durum makinesi"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-11" data-label="DFD · Seviye 0" aria-label="DFD Seviye 0"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-12" data-label="DFD · Seviye 1" aria-label="DFD Seviye 1"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-13" data-label="Faz protokolü" aria-label="Faz protokolü"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-14" data-label="Teknik özet" aria-label="Teknik özet"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-15" data-label="Yol haritası" aria-label="Yol haritası"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-16" data-label="Göstergeler" aria-label="Göstergeler"></button></li>
+        <li><button type="button" class="dot-nav__btn" data-target="slide-17" data-label="İletişim" aria-label="İletişim"></button></li>
+      </ol>
+    </nav>
+
+    <main class="snap-root" id="snap-root">
+      <!-- 01 Kapak -->
+      <section id="slide-1" class="slide slide--hero" data-section="1">
+        <div class="slide__inner">
+          <p class="eyebrow"><span class="section-num">01</span> Uç Birim · Edge Device Mimarisi</p>
+          <h1 class="hero-title">
+            <span class="hero-title__brand">Myola <span class="hero-title__biosense">BioSense</span></span>
+            <span class="hero-title__sub">ESP32-S3 uç birimi · biyo-sinyal DAQ · z-uzayı PID kapalı çevrim · BLE veri döngüsü</span>
+          </h1>
+          <p class="hero-lead">
+            Hastanın biyomekanik sinyallerini (EMG · IMU · Laktat) gerçek zamanlı okuyan, filtreleyen ve
+            latching solenoid aktüatörünü kapalı çevrimli olarak süren otonom bir dinamik rehabilitasyon uç birimi.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn--primary" href="#slide-2">Problemi gör</a>
+            <a class="btn btn--ghost" href="#slide-11">Veri akışı (DFD)</a>
+          </div>
+          <dl class="hero-meta">
+            <div class="hero-meta__item">
+              <dt class="hero-meta__label">MCU</dt>
+              <dd class="hero-meta__value">ESP32-S3 · çift çekirdek</dd>
+            </div>
+            <div class="hero-meta__item">
+              <dt class="hero-meta__label">KONTROL</dt>
+              <dd class="hero-meta__value">PID (z-uzayı)</dd>
+            </div>
+            <div class="hero-meta__item">
+              <dt class="hero-meta__label">TELEMETRİ</dt>
+              <dd class="hero-meta__value">
+                <span class="ble-pulse" aria-hidden="true"></span>
+                BLE · periyodik
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div class="scroll-hint" aria-hidden="true">
+          <span class="scroll-hint__text">Kaydır</span>
+          <span class="scroll-hint__chev"></span>
+        </div>
+      </section>
+
+      <!-- 02 Problem & Çözüm -->
+      <section id="slide-2" class="slide slide--two" data-section="2">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">02</span> Neden gerekli?</p>
+            <h2 class="section-title">Problem &amp; çözüm</h2>
+            <p class="section-desc">Üst ekstremite yaralanmalarında rehabilitasyonun klinik gerçeği ile uç birimimizin cevabı.</p>
+          </header>
+          <div class="two-panel">
+            <article class="panel panel--problem glass-panel" data-reveal>
+              <header class="panel__head">
+                <span class="panel__tag panel__tag--alert">Problem</span>
+                <h3 class="panel__title">Mevcut rehabilitasyon süreci</h3>
+              </header>
+              <ul class="panel__list">
+                <li><strong>Öznel değerlendirme</strong> — yorgunluk eşiği terapist gözlemine bağlı, nesnel ölçüm yok.</li>
+                <li><strong>Statik ortez zorluğu</strong> — uzun immobilizasyon kas atrofisi ve eklem sertliği getirir.</li>
+                <li><strong>Klinisyene körleme dönüş</strong> — seanslar arası hastanın biyo-verisi kayıt altında değil.</li>
+                <li><strong>Enerji maliyeti</strong> — sürekli güç veren sistemler batarya ömrünü eritiyor, taşınabilirlik düşük.</li>
+              </ul>
+            </article>
+            <article class="panel panel--solution glass-panel" data-reveal>
+              <header class="panel__head">
+                <span class="panel__tag panel__tag--ok">Çözüm</span>
+                <h3 class="panel__title">Myola BioSense yaklaşımı</h3>
+              </header>
+              <ul class="panel__list">
+                <li><strong>Dinamik ortez mantığı</strong> — kontrollü hareket: kas aktivasyonunu destekler, tendon gliding sağlar.</li>
+                <li><strong>Kapalı çevrim PID + EMG</strong> — assist seviyesi hastanın anlık kas gücüne göre %20–40 hedefiyle ayarlanır.</li>
+                <li><strong>BLE telemetri</strong> — seans sonunda veri paketi mobil uygulamaya ve klinisyene iletilir.</li>
+                <li><strong>Latching solenoid</strong> — kilitli bekleme ≈ 0 mW; uç birim event-driven uyku ile uzun ömürlü.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 Klinik temel & endikasyonlar -->
+      <section id="slide-3" class="slide slide--clinic" data-section="3">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">03</span> Klinik çerçeve</p>
+            <h2 class="section-title">Dinamik ortez mantığı &amp; endikasyonlar</h2>
+            <p class="section-desc">Modern ortopedinin temeli <strong>erken mobilizasyon</strong> — tam immobilizasyon iyileştirici değil, atrofi kaynağıdır.</p>
+          </header>
+          <div class="clinic-grid">
+            <aside class="clinic-lead glass-panel" data-reveal>
+              <h3 class="clinic-lead__title">Statik ↔ Dinamik</h3>
+              <div class="compare">
+                <div class="compare__col compare__col--cons">
+                  <span class="compare__tag">Statik ortez</span>
+                  <ul class="compare__list">
+                    <li class="is-pro">+ max stabilizasyon</li>
+                    <li class="is-con">− eklem sertliği</li>
+                    <li class="is-con">− kas atrofisi</li>
+                  </ul>
+                </div>
+                <div class="compare__col compare__col--pros">
+                  <span class="compare__tag compare__tag--ok">Dinamik (Myola)</span>
+                  <ul class="compare__list">
+                    <li class="is-pro">+ kontrollü hareket</li>
+                    <li class="is-pro">+ tendon gliding</li>
+                    <li class="is-pro">+ kas aktivasyonu</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="assist-callout">
+                <span class="assist-callout__num">%20–40</span>
+                <div class="assist-callout__body">
+                  <strong>Hedef assist seviyesi</strong>
+                  <span>Tam destek değil — kas yük alır, hipertrofi korunur. Destek zamanla azaltılır.</span>
+                </div>
+              </div>
+              <p class="clinic-lead__foot">
+                “Kasın yerine geçmez; <strong>hareketi başlatır ve yönlendirir.</strong> Kas aktivasyonunu zorunlu kılar, destek zamanla azalır.”
+              </p>
+            </aside>
+            <div class="clinic-indications">
+              <article class="indication" data-reveal>
+                <span class="indication__tag">Omuz çıkığı</span>
+                <h4 class="indication__title">Dış rotasyon kısıtlaması</h4>
+                <p class="indication__text">≈ 3 hafta velpau bandajı yerine; dış rotasyonu kısıtlayan ayarlanabilir açı, erken hareket + kas gücü koruması. Özellikle yaşlı hastada dirsek sertliğini engeller.</p>
+              </article>
+              <article class="indication" data-reveal>
+                <span class="indication__tag">Dirsek kırık / çıkık</span>
+                <h4 class="indication__title">Kademeli ekstansiyon / fleksiyon</h4>
+                <p class="indication__text">Fleksiyon ve ekstansiyon yüzleri ayarlanabilir; omuz ROM korunur. Kontrollü açı ilerlemesi ile eklem sertliği önlenir.</p>
+              </article>
+              <article class="indication" data-reveal>
+                <span class="indication__tag">Humerus kırığı</span>
+                <h4 class="indication__title">Erken dönem hareket izni</h4>
+                <p class="indication__text">Kırık stabilitesi korunarak düşük yoğunluklu, pasif asistanslı hareket; kemik iyileşmesi sırasında çevre kasların tonunu sürdürür.</p>
+              </article>
+              <article class="indication" data-reveal>
+                <span class="indication__tag">Tendon kesisi</span>
+                <h4 class="indication__title">Tedrici, kontraktür önleyici</h4>
+                <p class="indication__text">Onarım hattını koruyan sınır açılar içinde tedrici mobilizasyon; yapışıklık (kontraktür) oluşumu azalır, gliding korunur.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Klinik çıktılar & biyobelirteçler (YENİ) -->
+      <section id="slide-4" class="slide slide--clinic slide--biomarker" data-section="4">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">04</span> Klinik zeka katmanı</p>
+            <h2 class="section-title">Sinyalden nesnel karara</h2>
+            <p class="section-desc">Ham biyo-sinyaller MCU + mobil AI katmanında işlenerek klinisyenin doğrudan kullanabileceği <strong>sayısal biyobelirteçlere</strong> dönüşür — “ne hissediyorsun” değil, <em>ne ölçüyoruz</em>.</p>
+          </header>
+          <div class="clinic-grid">
+            <aside class="clinic-lead glass-panel" data-reveal>
+              <h3 class="clinic-lead__title">Veriden karara dönüşüm</h3>
+              <ol class="data-flow">
+                <li>
+                  <span class="data-flow__src">EMG</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__mid">zarf + median freq</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__out">PFI</span>
+                </li>
+                <li>
+                  <span class="data-flow__src">IMU</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__mid">Madgwick + trajektori</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__out">ROM</span>
+                </li>
+                <li>
+                  <span class="data-flow__src">Laktat</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__mid">trend + eşik analizi</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__out">LT</span>
+                </li>
+                <li>
+                  <span class="data-flow__src">Füzyon</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__mid">PFI · ROM · LT</span>
+                  <span class="data-flow__arrow">→</span>
+                  <span class="data-flow__out">AAS</span>
+                </li>
+              </ol>
+              <div class="assist-callout assist-callout--alt">
+                <span class="assist-callout__num">0</span>
+                <div class="assist-callout__body">
+                  <strong>öznel skor</strong>
+                  <span>Klinik kararlar ölçülebilir biyobelirteçlere dayanır — hasta ↔ klinisyen iletişimi nesneldir.</span>
+                </div>
+              </div>
+              <p class="clinic-lead__foot">
+                “<strong>Ne hissediyorsun?</strong>” yerine <strong>“Ne ölçüyoruz?”</strong> — tedavi kararı hasta yorgunluk skalasından değil, sinyalden gelir.
+              </p>
+            </aside>
+            <div class="clinic-indications">
+              <article class="indication indication--biomarker" data-reveal>
+                <span class="indication__tag indication__tag--alt">PFI</span>
+                <h4 class="indication__title">Periferik Yorgunluk İndeksi</h4>
+                <dl class="indication__meta">
+                  <div><dt>Kaynak</dt><dd>EMG median-freq kayması</dd></div>
+                  <div><dt>Birim</dt><dd>0–100 skor</dd></div>
+                </dl>
+                <p class="indication__text">Kas aksiyon potansiyelinin frekans içeriği yorgunlukla aşağı kayar; bu kayma oranı <strong>nesnel yorgunluk</strong> göstergesidir.</p>
+              </article>
+              <article class="indication indication--biomarker" data-reveal>
+                <span class="indication__tag indication__tag--alt">ROM</span>
+                <h4 class="indication__title">Aktif ROM skoru</h4>
+                <dl class="indication__meta">
+                  <div><dt>Kaynak</dt><dd>IMU açı trajektorisi</dd></div>
+                  <div><dt>Birim</dt><dd>% hedef açı</dd></div>
+                </dl>
+                <p class="indication__text">Hedeflenen eklem açısına ne oranda ulaşıldığını seans bazında raporlar — <strong>fonksiyonel iyileşmenin</strong> birincil ölçütü.</p>
+              </article>
+              <article class="indication indication--biomarker" data-reveal>
+                <span class="indication__tag indication__tag--alt">LT</span>
+                <h4 class="indication__title">Laktat eşiği</h4>
+                <dl class="indication__meta">
+                  <div><dt>Kaynak</dt><dd>Laktat sensörü + EMG trendi</dd></div>
+                  <div><dt>Birim</dt><dd>mmol/L</dd></div>
+                </dl>
+                <p class="indication__text">Aerobik ↔ anaerobik metabolizma geçişini gösterir; <strong>aşırı yüklenme uyarısı</strong> ve seans yoğunluk ayarı için kullanılır.</p>
+              </article>
+              <article class="indication indication--biomarker" data-reveal>
+                <span class="indication__tag indication__tag--alt">AAS</span>
+                <h4 class="indication__title">Adaptif Assist Seviyesi</h4>
+                <dl class="indication__meta">
+                  <div><dt>Kaynak</dt><dd>PFI + ROM + LT füzyonu</dd></div>
+                  <div><dt>Birim</dt><dd>% · hedef %20–40</dd></div>
+                </dl>
+                <p class="indication__text">Üst biyobelirteçlerin ağırlıklı bileşimiyle uç birimin desteği <strong>dinamik güncellenir</strong> — kişiye özel, zamanla azalan.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 Sistem mimarisi -->
+      <section id="slide-5" class="slide slide--catalog" data-section="5">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">05</span> Gömülü sistem mimarisi</p>
+            <h2 class="section-title">Uç birim (Edge Device) tasarım kararları</h2>
+            <p class="section-desc">ESP32-S3 üzerinde çalışan hiyerarşik kontrol katmanı — üç temel mühendislik tercihi ve <em>neden</em>'i.</p>
+          </header>
+          <div class="catalog-grid">
+            <article class="tilt-card" data-tilt>
+              <div class="tilt-card__shine"></div>
+              <div class="tilt-card__icon" aria-hidden="true">⎔</div>
+              <h3 class="tilt-card__title">Çift çekirdekli asenkron işlem</h3>
+              <p class="tilt-card__text">
+                <strong>Core 0</strong> BLE iletişimi + paketleme; <strong>Core 1</strong> donanım kesmeleri + gerçek zamanlı PID. Veri gönderimi sırasında motor kontrolünde kararsızlık (stutter) donanımsal olarak engellenir.
+              </p>
+              <ul class="tilt-card__meta">
+                <li>Xtensa LX7 · 240 MHz</li>
+                <li>FreeRTOS · görev tahsisi</li>
+              </ul>
+            </article>
+            <article class="tilt-card" data-tilt>
+              <div class="tilt-card__shine"></div>
+              <div class="tilt-card__icon tilt-card__icon--gold" aria-hidden="true">∿</div>
+              <h3 class="tilt-card__title">Z-uzayı PID kapalı çevrim</h3>
+              <p class="tilt-card__text">
+                s-uzayında tasarlanan geri besleme döngüsü ayrık-zaman <em>z</em>-uzayına dönüştürülerek MCU'da çalışır. <strong>K<sub>p</sub>, K<sub>i</sub>, K<sub>d</sub></strong> katsayıları IMU açı hatasını minimize eder; hareket profili sarsıntısızdır.
+              </p>
+              <ul class="tilt-card__meta">
+                <li>T<sub>s</sub> = 5 ms kontrol periyodu</li>
+                <li>Anti-windup + saturasyon</li>
+              </ul>
+            </article>
+            <article class="tilt-card" data-tilt>
+              <div class="tilt-card__shine"></div>
+              <div class="tilt-card__icon tilt-card__icon--purple" aria-hidden="true">◈</div>
+              <h3 class="tilt-card__title">Event-driven güç yönetimi</h3>
+              <p class="tilt-card__text">
+                Latching solenoid kilitli pozisyonda <strong>0 mW</strong> tüketir; ESP32-S3 yalnızca EMG yetersiz kaldığında kısa PWM darbeleri üretir. Boştayken uç birim <em>deep-sleep</em>'e geçer ve batarya ömrü maksimize edilir.
+              </p>
+              <ul class="tilt-card__meta">
+                <li>RTC timer uyanma</li>
+                <li>&lt; 10 µA uyku akımı</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 Donanım blok şeması -->
+      <section id="slide-6" class="slide slide--dfd" data-section="6">
+        <div class="slide__inner slide__inner--dfd slide__inner--dfd-wide">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">06</span> Donanım · Blok şeması</p>
+            <h2 class="section-title">Fiziksel mimari</h2>
+            <p class="section-desc">ESP32-S3 çevresinde sensör ön-yükselteç katmanı, motor sürücü ve güç yönetiminin bağlantı topolojisi.</p>
+          </header>
+          <div id="hw-block" class="dfd-mount dfd-mount--lg" role="img" aria-label="Donanım blok şeması"></div>
+        </div>
+      </section>
+
+      <!-- 07 Sensör katmanı -->
+      <section id="slide-7" class="slide slide--sensors" data-section="7">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">07</span> Sensör &amp; aktüatör katmanı</p>
+            <h2 class="section-title">Donanım bileşenleri</h2>
+            <p class="section-desc">Her bileşen için görev, örnekleme ve kontrol hattı.</p>
+          </header>
+          <div class="sensor-grid">
+            <article class="sensor-card glass-panel" data-reveal>
+              <div class="sensor-card__head">
+                <span class="sensor-card__icon" style="--c:#00f5d4">⌘</span>
+                <span class="sensor-card__chip">1 kHz</span>
+              </div>
+              <h3 class="sensor-card__title">EMG sensörü</h3>
+              <p class="sensor-card__text">Kasın aksiyon potansiyelini yakalar. Ön-yükselteç + enstrümantasyon amplifikatör; dijital HPF ile baseline drift giderilir, zarf çıkarıcı (RMS) yorgunluk belirteci üretir.</p>
+              <dl class="sensor-card__specs">
+                <div><dt>Rol</dt><dd>Kas aktivasyonu</dd></div>
+                <div><dt>Çıkış</dt><dd>EMG zarfı (mV)</dd></div>
+                <div><dt>Kanal</dt><dd>ADC · 12-bit</dd></div>
+              </dl>
+            </article>
+            <article class="sensor-card glass-panel" data-reveal>
+              <div class="sensor-card__head">
+                <span class="sensor-card__icon" style="--c:#a78bfa">⬡</span>
+                <span class="sensor-card__chip">100–200 Hz</span>
+              </div>
+              <h3 class="sensor-card__title">IMU (6-DOF)</h3>
+              <p class="sensor-card__text">3 eksen ivmeölçer + 3 eksen jiroskop. Madgwick / tamamlayıcı filtre ile füzyon; gerçek zamanlı <strong>eklem açısı</strong> kestirimi PID geri beslemesine girer.</p>
+              <dl class="sensor-card__specs">
+                <div><dt>Rol</dt><dd>Eklem açısı</dd></div>
+                <div><dt>Arayüz</dt><dd>I²C / SPI</dd></div>
+                <div><dt>Füzyon</dt><dd>Madgwick</dd></div>
+              </dl>
+            </article>
+            <article class="sensor-card glass-panel" data-reveal>
+              <div class="sensor-card__head">
+                <span class="sensor-card__icon" style="--c:#fbbf24">≋</span>
+                <span class="sensor-card__chip">0.03 Hz</span>
+              </div>
+              <h3 class="sensor-card__title">Laktat sensörü</h3>
+              <p class="sensor-card__text">Terden laktat konsantrasyonu. Biyokimyasal cevap yavaş — 30 saniyelik periyotlarla örneklenir, tamponlanır, mobil AI'ya laktat eşiği hesabı için gönderilir.</p>
+              <dl class="sensor-card__specs">
+                <div><dt>Rol</dt><dd>Metabolik yük</dd></div>
+                <div><dt>Çıkış</dt><dd>mmol/L</dd></div>
+                <div><dt>Dönüş</dt><dd>Laktat eşiği</dd></div>
+              </dl>
+            </article>
+            <article class="sensor-card glass-panel" data-reveal>
+              <div class="sensor-card__head">
+                <span class="sensor-card__icon" style="--c:#f472b6">◉</span>
+                <span class="sensor-card__chip">PWM</span>
+              </div>
+              <h3 class="sensor-card__title">Latching solenoid</h3>
+              <p class="sensor-card__text">Çift stabil kilitlemeli aktüatör. Kilit / açma için <strong>kısa PWM darbesi</strong> yeterli; arada güç tüketimi sıfır. Sürücü üzerinden akım ve konum geri beslemesi PID'ye döner.</p>
+              <dl class="sensor-card__specs">
+                <div><dt>Rol</dt><dd>Mekanik destek</dd></div>
+                <div><dt>Bekleme</dt><dd>≈ 0 mW</dd></div>
+                <div><dt>Kontrol</dt><dd>PWM + FB</dd></div>
+              </dl>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 Sinyal işleme hattı -->
+      <section id="slide-8" class="slide slide--dfd" data-section="8">
+        <div class="slide__inner slide__inner--dfd slide__inner--dfd-wide">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">08</span> Sinyal işleme · DSP pipeline</p>
+            <h2 class="section-title">Ham veriden karar girdisine</h2>
+            <p class="section-desc">EMG ve IMU verileri MCU üzerinde sırasıyla filtrelenir, füzyona uğrar ve PID geri besleme hattına sunulur.</p>
+          </header>
+          <div id="signal-pipeline" class="dfd-mount dfd-mount--lg" role="img" aria-label="Sinyal işleme boru hattı"></div>
+        </div>
+      </section>
+
+      <!-- 09 Kontrol algoritması -->
+      <section id="slide-9" class="slide slide--control" data-section="9">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">09</span> Kontrol algoritması</p>
+            <h2 class="section-title">Kapalı çevrim PID (z-uzayı)</h2>
+            <p class="section-desc">Sürekli zamanlı PID kanunu ayrık zamanda örneklenir ve mikrodenetleyicide gerçek zamanlı çalıştırılır.</p>
+          </header>
+          <div class="pid-display">
+            <div id="pid-block" class="pid-diagram" role="img" aria-label="PID kapalı çevrim blok diyagramı"></div>
+            <aside class="pid-side glass-panel">
+              <h3 class="pid-side__title">Ayrık zamanlı kontrol kanunu</h3>
+              <p class="pid-side__desc">Hedef açı <code>θ*[k]</code> ile IMU'dan gelen gerçek açı <code>θ[k]</code> arasındaki hata her örnekleme periyodunda hesaplanır:</p>
+              <pre class="pid-formula" aria-label="PID formülü">e[k] = θ*[k] − θ[k]
+
+u[k] = K<sub>p</sub> · e[k]
+     + K<sub>i</sub> · Σ e[i] · T<sub>s</sub>
+     + K<sub>d</sub> · (e[k] − e[k−1]) / T<sub>s</sub></pre>
+              <ul class="pid-side__list">
+                <li><strong>T<sub>s</sub></strong> — 5 ms örnekleme periyodu</li>
+                <li><strong>Anti-windup</strong> — integral terim saturasyonu</li>
+                <li><strong>Feed-forward</strong> — EMG zarfı destek ön-kompanzasyonu</li>
+              </ul>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 Firmware durum makinesi -->
+      <section id="slide-10" class="slide slide--dfd" data-section="10">
+        <div class="slide__inner slide__inner--dfd slide__inner--dfd-wide">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">10</span> Firmware · Durum makinesi</p>
+            <h2 class="section-title">Uç birim yürütme döngüsü</h2>
+            <p class="section-desc">Uyku, kalibrasyon, aktif kontrol, telemetri ve hata durumlarının geçişleri — FreeRTOS görevleri üzerinde olay tetiklemeli.</p>
+          </header>
+          <div id="state-machine" class="dfd-mount dfd-mount--lg" role="img" aria-label="Firmware durum makinesi diyagramı"></div>
+        </div>
+      </section>
+
+      <!-- 11 DFD Seviye 0 -->
+      <section id="slide-11" class="slide slide--dfd" data-section="11">
+        <div class="slide__inner slide__inner--dfd">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">11</span> Versiyon · Bağlam diyagramı</p>
+            <h2 class="section-title">DFD — Seviye 0</h2>
+            <p class="section-desc">Uç birimin dış dünyayla veri alışverişi: hasta biyo-sinyali, aktüatör kontrolü ve mobil uygulama ile BLE senkronizasyonu.</p>
+          </header>
+          <div id="dfd-level-0" class="dfd-mount" role="img" aria-label="Seviye sıfır bağlam diyagramı"></div>
+          <p class="dfd-legend">
+            <strong>0.0</strong> Myola BioSense Uç Birim — <strong>ESP32-S3</strong> üzerinde biyo-sinyalden kapalı çevrim motor kontrolüne uzanan tek noktalı akış merkezi.
+          </p>
+        </div>
+      </section>
+
+      <!-- 12 DFD Seviye 1 -->
+      <section id="slide-12" class="slide slide--dfd" data-section="12">
+        <div class="slide__inner slide__inner--dfd slide__inner--dfd-wide">
+          <header class="section-head section-head--compact">
+            <p class="eyebrow"><span class="section-num">12</span> Versiyon · İç süreç ayrıntısı</p>
+            <h2 class="section-title">DFD — Seviye 1</h2>
+            <p class="section-desc">Uç birim içindeki omurga: <strong>DAQ → Filtre &amp; Füzyon → PID (z-uzayı) → PWM Sürücü</strong>, seans tamponu ve BLE paketleme döngüsü.</p>
+          </header>
+          <div id="dfd-level-1" class="dfd-mount dfd-mount--lg" role="img" aria-label="Seviye bir detaylı veri akış diyagramı"></div>
+        </div>
+      </section>
+
+      <!-- 13 Faz protokolü -->
+      <section id="slide-13" class="slide slide--phase" data-section="13">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">13</span> Uygulama protokolü</p>
+            <h2 class="section-title">Kullanım fazları &amp; assist profili</h2>
+            <p class="section-desc">Doku iyileşmesinin evrelerine göre cihaz destek seviyesi (assist) aşamalı olarak azaltılır — hedef <strong>%20–40</strong> bandında kaslara yük aktarmak.</p>
+          </header>
+          <div class="timeline">
+            <div class="timeline__track" aria-hidden="true"></div>
+            <div class="timeline__items timeline__items--3">
+              <div class="timeline-card" data-reveal>
+                <span class="timeline-card__badge">0–5 gün · İnflamasyon</span>
+                <h3 class="timeline-card__title">Pasif destek · yüksek assist</h3>
+                <p class="timeline-card__text">Velpau bandajı benzeri kontrollü immobilizasyon; ayarlı açı kısıtlayıcısı ile dış rotasyon sınırlanır. Düşük PWM duty, kısa seans — ağrı/şişlik yönetimi önceliklidir.</p>
+                <span class="assist-chip">assist ≈ <strong>60–80%</strong></span>
+              </div>
+              <div class="timeline-card timeline-card--accent" data-reveal>
+                <span class="timeline-card__badge timeline-card__badge--alt">5–21 gün · Proliferasyon</span>
+                <h3 class="timeline-card__title">Pasif → kontrollü aktif geçiş</h3>
+                <p class="timeline-card__text">Tendon gliding için pasif ROM; ardından EMG zarfına göre asiste aktif hareket. Kademeli ekstansiyon / fleksiyon yüzleri hedef açıya göre genişletilir.</p>
+                <span class="assist-chip assist-chip--target">assist <strong>%20–40</strong> (hedef)</span>
+              </div>
+              <div class="timeline-card" data-reveal>
+                <span class="timeline-card__badge timeline-card__badge--alt2">21+ gün · Remodelasyon</span>
+                <h3 class="timeline-card__title">İleri faz · zamanla azalan destek</h3>
+                <p class="timeline-card__text">Kas aktivasyonu baskın; cihaz yalnızca yorgunluk eşiğinde destek verir. Cihaz <em>hareketi başlatır ve yönlendirir</em>, kasın yerine geçmez.</p>
+                <span class="assist-chip">assist &lt; <strong>%20</strong></span>
+              </div>
+            </div>
+          </div>
+          <p class="phase-note">
+            * Klinik karar hekim ve fizyoterapist değerlendirmesindedir; cihaz bu süreci <strong>nesnel biyo-veriyle</strong> destekler.
+          </p>
+        </div>
+      </section>
+
+      <!-- 14 Teknik özet -->
+      <section id="slide-14" class="slide slide--spec" data-section="14">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">14</span> Teknik özet · prototip</p>
+            <h2 class="section-title">Donanım &amp; kontrol katmanı</h2>
+            <p class="section-desc">Prototip çalışma değerleri — ürün dokümantasyonu ile güncellenir.</p>
+          </header>
+          <div class="spec-table-wrap glass-panel">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Katman</th>
+                  <th>Parametre</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Mikrodenetleyici</td><td>ESP32-S3 · Xtensa LX7 · çift çekirdek · Wi-Fi/BLE 5.0</td></tr>
+                <tr><td>Biyo-sinyal DAQ</td><td>EMG ~1 kHz · IMU 100–200 Hz · Laktat 0.03 Hz (30 sn)</td></tr>
+                <tr><td>Sinyal işleme</td><td>Dijital filtre (IIR/FIR) · EMG zarfı · IMU füzyonu (Madgwick)</td></tr>
+                <tr><td>Kontrol</td><td>Kapalı çevrim PID — z-uzayı · T<sub>s</sub> 5 ms · anti-windup</td></tr>
+                <tr><td>Aktüatör</td><td>Latching solenoid · PWM sürücü · akım/konum geri besleme</td></tr>
+                <tr><td>Biyobelirteçler</td><td>PFI · ROM · LT · AAS (kaynak: EMG + IMU + Laktat füzyonu)</td></tr>
+                <tr><td>Assist profili</td><td>Hedef %20–40 · zamanla azalan · EMG tetikli</td></tr>
+                <tr><td>Ayarlanabilirlik</td><td>ROM · kuvvet · hız — kişiye özel (mobil uygulamadan)</td></tr>
+                <tr><td>Güç yönetimi</td><td>Event-driven uyku · kilitli solenoid ≈ 0 mW · &lt; 10 µA sleep</td></tr>
+                <tr><td>Telemetri</td><td>BLE 5.0 · periyodik paket · 30 dk seans döngüsü</td></tr>
+                <tr><td>Güvenlik</td><td>Akım saturasyonu · aşırı açı kesmesi · watchdog timer</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15 Yol haritası -->
+      <section id="slide-15" class="slide slide--roadmap" data-section="15">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">15</span> TRL yol haritası</p>
+            <h2 class="section-title">Konsepten üretime</h2>
+            <p class="section-desc">Teknoloji hazırlık seviyesi (TRL) bazında mevcut konum ve sonraki adımlar.</p>
+          </header>
+          <ol class="roadmap">
+            <li class="roadmap__step is-done" data-reveal>
+              <div class="roadmap__dot"></div>
+              <div class="roadmap__body">
+                <span class="roadmap__tag">TRL 3</span>
+                <h3 class="roadmap__title">Kavramsal doğrulama</h3>
+                <p class="roadmap__text">Matematiksel model, simülasyon, bileşen seçimi — akademik literatür temelli.</p>
+              </div>
+            </li>
+            <li class="roadmap__step is-active" data-reveal>
+              <div class="roadmap__dot"></div>
+              <div class="roadmap__body">
+                <span class="roadmap__tag">TRL 4 · Şimdi</span>
+                <h3 class="roadmap__title">Laboratuvar prototipi</h3>
+                <p class="roadmap__text">ESP32-S3 + sensör devresi + solenoid sürücü entegrasyonu; kontrollü ortamda kapalı çevrim doğrulama.</p>
+              </div>
+            </li>
+            <li class="roadmap__step" data-reveal>
+              <div class="roadmap__dot"></div>
+              <div class="roadmap__body">
+                <span class="roadmap__tag">TRL 5–6</span>
+                <h3 class="roadmap__title">Klinik benzeri test</h3>
+                <p class="roadmap__text">Gerçek kullanım ortamında pilot değerlendirmeler, iteratif PID kalibrasyonu, ergonomik iyileştirme.</p>
+              </div>
+            </li>
+            <li class="roadmap__step" data-reveal>
+              <div class="roadmap__dot"></div>
+              <div class="roadmap__body">
+                <span class="roadmap__tag">TRL 7–9</span>
+                <h3 class="roadmap__title">Saha &amp; sertifikasyon</h3>
+                <p class="roadmap__text">Klinik saha çalışması, CE-MDR / ISO 13485 uyumu, seri üretime hazır tasarım.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 16 Göstergeler -->
+      <section id="slide-16" class="slide slide--stats" data-section="16">
+        <div class="slide__inner slide__inner--wide">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">16</span> Mimari göstergeler</p>
+            <h2 class="section-title">Bir bakışta uç birim</h2>
+            <p class="section-desc">Hedeflenen örnekleme, işleme ve güç değerleri.</p>
+          </header>
+          <div class="stats-grid">
+            <div class="stat-card glass-panel" data-reveal>
+              <span class="stat-card__value"><span class="counter" data-target="1000">0</span><span class="stat-card__suffix">Hz</span></span>
+              <span class="stat-card__label">EMG örnekleme (hedef)</span>
+            </div>
+            <div class="stat-card glass-panel" data-reveal>
+              <span class="stat-card__value"><span class="counter" data-target="2">0</span><span class="stat-card__suffix">çekirdek</span></span>
+              <span class="stat-card__label">Asenkron görev (BLE / PID)</span>
+            </div>
+            <div class="stat-card glass-panel" data-reveal>
+              <span class="stat-card__value"><span class="counter" data-target="5">0</span><span class="stat-card__suffix">ms</span></span>
+              <span class="stat-card__label">PID kontrol döngüsü periyodu</span>
+            </div>
+          </div>
+          <ul class="checklist">
+            <li data-reveal>Dinamik ortez yaklaşımı — statik immobilizasyon yerine kontrollü hareket</li>
+            <li data-reveal>%20–40 hedef assist bandı — kas aktivasyonu zorunlu, atrofi önlenir</li>
+            <li data-reveal>4 nesnel biyobelirteç (PFI · ROM · LT · AAS) — öznel skor gerekmez</li>
+            <li data-reveal>Gerçek zamanlı kapalı çevrim PID — Core 1 donanım kesmelerine tahsisli</li>
+            <li data-reveal>BLE yalnızca seans sonunda paketi gönderir; RF gürültüsü kontrol döngüsüne sızmaz</li>
+            <li data-reveal>Mobil tarafta AI — periferik yorgunluk indeksi ve laktat eşiği hesaplaması</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 17 İletişim -->
+      <section id="slide-17" class="slide slide--contact" data-section="17">
+        <div class="slide__inner slide__inner--narrow">
+          <header class="section-head">
+            <p class="eyebrow"><span class="section-num">17</span> Kapanış</p>
+            <h2 class="section-title">İletişim &amp; notlar</h2>
+            <p class="section-desc">Bu form statik sitede demo amaçlıdır; gönderim simüle edilir.</p>
+          </header>
+          <form class="contact-form glass-panel" id="contact-form" novalidate>
+            <label class="field">
+              <span class="field__label">Ad Soyad</span>
+              <input class="field__input" type="text" name="name" autocomplete="name" required placeholder="Örn. Jüri Üyesi" />
+            </label>
+            <label class="field">
+              <span class="field__label">E-posta</span>
+              <input class="field__input" type="email" name="email" autocomplete="email" required placeholder="ornek@kurum.edu.tr" />
+            </label>
+            <label class="field">
+              <span class="field__label">Not</span>
+              <textarea class="field__input field__input--area" name="note" rows="3" placeholder="Soru veya geri bildirim"></textarea>
+            </label>
+            <button class="btn btn--primary btn--block" type="submit">Gönder (demo)</button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          </form>
+          <footer class="site-footer">
+            <p><strong>Myola BioSense</strong> · Uç birim mimarisi &amp; DFD sunumu</p>
+            <p class="site-footer__muted">© 2026 · GitHub Pages ile yayın · <kbd>Ctrl</kbd>+<kbd>P</kbd> ile PDF'e aktarılabilir</p>
+          </footer>
+        </div>
+      </section>
+    </main>
+
+    <script src="./dfd.js" defer></script>
+    <script src="./main.js" defer></script>
+  </body>
+</html>
