@@ -1807,6 +1807,135 @@ body {
   text-shadow: 0 0 20px rgba(0, 245, 212, 0.35);
 }
 
+/* === Güvenlik slaydı (05) === */
+.safety-list {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.safety-list li {
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(5, 5, 16, 0.35);
+  border: 1px solid rgba(244, 114, 182, 0.14);
+  border-radius: var(--radius-md);
+}
+.safety-list__tag {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 3px 8px;
+  color: #fbd5e9;
+  background: rgba(244, 114, 182, 0.12);
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  border-radius: 5px;
+  margin-top: 2px;
+}
+.safety-list li > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.safety-list li strong {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  letter-spacing: -0.005em;
+}
+.safety-list li span {
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
+/* Uyarı callout (kırmızı/pembe) — "Dinamik ≠ tam immobilizasyon" */
+.assist-callout--warn {
+  background:
+    radial-gradient(circle at 0% 50%, rgba(244, 114, 182, 0.18), transparent 55%),
+    rgba(244, 114, 182, 0.05);
+  border-color: rgba(244, 114, 182, 0.4);
+}
+.assist-callout--warn .assist-callout__num {
+  color: #f472b6;
+  font-size: 2.6rem;
+  text-shadow: 0 0 22px rgba(244, 114, 182, 0.45);
+}
+
+/* Kontrendikasyon kartları — uyarı varyantı */
+.indication--warn {
+  border-color: rgba(244, 114, 182, 0.22);
+  background:
+    linear-gradient(180deg, rgba(244, 114, 182, 0.04), rgba(255, 255, 255, 0.015));
+}
+.indication--warn:hover {
+  border-color: rgba(244, 114, 182, 0.5);
+  background: rgba(244, 114, 182, 0.06);
+}
+.indication__tag--warn {
+  color: #fbd5e9;
+  background: rgba(244, 114, 182, 0.12);
+  border-color: rgba(244, 114, 182, 0.4);
+}
+
+/* === Mekanik tasarım slaydı (08) · mor tema === */
+.indication--mech {
+  border-color: rgba(167, 139, 250, 0.22);
+  background:
+    linear-gradient(180deg, rgba(167, 139, 250, 0.04), rgba(255, 255, 255, 0.015));
+}
+.indication--mech:hover {
+  border-color: rgba(167, 139, 250, 0.5);
+  background: rgba(167, 139, 250, 0.06);
+}
+.indication__tag--mech {
+  color: #ddd6ff;
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.indication--mech .indication__text code {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  padding: 1px 6px;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 4px;
+  color: #ddd6ff;
+  white-space: nowrap;
+}
+
+.compare__tag--mech {
+  color: #ddd6ff !important;
+  background: rgba(167, 139, 250, 0.15) !important;
+  border-color: rgba(167, 139, 250, 0.4) !important;
+}
+
+/* Moment kolu callout (M = F·d) — mor varyant + formül için geniş num */
+.assist-callout--mech {
+  background:
+    radial-gradient(circle at 0% 50%, rgba(167, 139, 250, 0.18), transparent 55%),
+    rgba(167, 139, 250, 0.05);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.assist-callout--mech .assist-callout__num {
+  color: #ddd6ff;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-shadow: 0 0 22px rgba(167, 139, 250, 0.45);
+  padding: 4px 10px;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  border-radius: 6px;
+  background: rgba(167, 139, 250, 0.08);
+}
+
 /* === Faz protokolü: assist chip === */
 .assist-chip {
   display: inline-flex;
